@@ -1,2 +1,5 @@
 #binary file
 src/main
+
+#File of my passwords
+.password.txt
