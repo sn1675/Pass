@@ -1,0 +1,16 @@
+{
+    "entries": [
+        {
+            "note": "",
+            "password": "Test1234",
+            "site": "google.com",
+            "username": "usergoogle"
+        },
+        {
+            "note": "un",
+            "password": "password",
+            "site": "huh.com",
+            "username": "huh"
+        }
+    ]
+}
