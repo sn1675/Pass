@@ -6,9 +6,6 @@
 #include <fstream>
 #include "../json/json.hpp"
 
-#define true 1
-#define false 0
-
 using json = nlohmann::json; //permet de pas ecrire nlohmann::json a chaque fois
 
 json lireFichier(const std::string& cheminFichier){
@@ -47,7 +44,7 @@ void ajouterEntree(const std::string& cheminFichier, std::string& site, std::str
     output << data.dump(4);
     output.close();
 
-    std::cout << "Mdp défini !" << std::endl;
+    std::cout << "Mdp bien defini !" << std::endl;
 
 }
 
@@ -91,14 +88,12 @@ void passGen(int *len, int *maj, int *num, int *spe){
     std::string numb = "0123456789";
     std::string spec = "!@#$%^&*()-_=+[]{};:,.<>?/";
 
-    std::string comp = let;
-
-    if (*maj) comp += majLet;
-    if (*num) comp += numb;
-    if (*spe) comp += spec;
+    if (*maj) let += majLet;
+    if (*num) let += numb;
+    if (*spe) let += spec;
 
     for(int i=0; i<*len; i++){
-        mdp += comp[rand() % comp.size()];
+        mdp += let[rand() % let.size()];
     }
     std::cout << mdp << std::endl;
 }
@@ -125,16 +120,12 @@ int main(){
             }
 
             case 1: {
-                std::string choixLen;
-                std::string choixLenBug = "";
                 int len = 8;
                 int maj = false, num = false, spe = false;
 
                 std::cout << "longeur du mdp : ";
-                std::cin >> choixLen;
+                std::cin >> len;
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-                choixLenBug += choixLen;
 
                 if (choixInput("voulez vous ajouter des majuscules ? (Y, n)")){ maj = true; }
                 if (choixInput("voulez vous ajouter des nombres ? (Y, n)")){ num = true; }
@@ -149,7 +140,7 @@ int main(){
 
             case 2: {
 
-                /*demander le mdp pour decrypter les mdp*/
+                /*demander le mdp pour decrypter*/
 
                 json data = lireFichier("../json/mdp.json");
 

@@ -11,6 +11,12 @@
             "password": "password",
             "site": "huh.com",
             "username": "huh"
+        },
+        {
+            "note": "ent",
+            "password": "CeciEstUnBonMotDePasse2005!",
+            "site": "entuphf.fr",
+            "username": "nathan.courbet"
         }
     ]
 }
