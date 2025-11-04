@@ -1,3 +1,15 @@
+/*
+ * __Projet Cestionaire__
+ *
+ * Projet L3 informatique, INSA UPHF
+ *
+ * Tuteur de projet : Christophe Wilbaut
+ *
+ * Créateur : Nathan Courbet
+ *
+*/
+
+
 #include <iostream>
 #include <string>
 #include <thread>
