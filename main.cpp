@@ -9,7 +9,7 @@
  *
 */
 
-#include "App.hpp"
+#include "src/App.hpp"
 
 int main(){
 
@@ -18,4 +18,4 @@ int main(){
     return 0;
 }
 
-/*g++ main.cpp app.cpp -o main && ./main*/
+//g++ main.cpp src/*.cpp -o main && ./main
