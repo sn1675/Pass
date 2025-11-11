@@ -84,7 +84,7 @@ void App::menu(){
 
                 /*demander le mdp pour decrypter*/
 
-                json data = JsonGestionner::lireFichier("../json/mdp.json");
+                json data = JsonGestionner::lireFichier("json/mdp.json");
 
                 if(data.contains("entries")){
                     for(const auto& entry : data["entries"]){
@@ -107,7 +107,7 @@ void App::menu(){
                 std::cin >> mdp;
                 std::cout << "entrez une note : ";
                 std::cin >> note;
-                JsonGestionner::ajouterEntree("../json/mdp.json", site, username, mdp, note);
+                JsonGestionner::ajouterEntree("json/mdp.json", site, username, mdp, note);
                 break;
             }
 
