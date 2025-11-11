@@ -5,6 +5,8 @@
 class App {
     public:
 
+    static void login();
+
     static void menu();
 };
 

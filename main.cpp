@@ -13,7 +13,7 @@
 
 int main(){
 
-    App::menu();
+    App::login();
 
     return 0;
 }

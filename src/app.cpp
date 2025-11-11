@@ -42,6 +42,31 @@ bool choixInput(std::string demande){
     return false;
 }
 
+void App::login(){
+    short count = 0;
+
+    std::string id;
+    std::string password;
+    while (count < 3) {
+
+
+        std::cout << "Id: ";
+        std::cin >> id;
+
+        std::cout << "password: ";
+        std::cin >>password;
+
+        if (id == "nath" && password == "abc") {
+            App::menu();
+        }
+
+        std::cout << "\nMot de passe ou id errone veuillez reesayer\n\n";
+        ++count;
+    }
+
+    std::cout << "nombre d'essais trop important\nau revoir !" << std::endl;
+}
+
 void App::menu(){
 
     while(true){
