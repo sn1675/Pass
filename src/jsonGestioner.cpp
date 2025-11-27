@@ -7,21 +7,21 @@
 
 using json = nlohmann::json; //permet de pas ecrire nlohmann::json a chaque fois
 
-json JsonGestionner::lireFichier(const std::string& cheminFichier){
-    std::ifstream fichier(cheminFichier);
-    if(!fichier){
-        std::cerr << "Erreur de l'ecture du fichier : " << cheminFichier << std::endl;
+json JsonGestionner::readFile(const std::string& filePath){
+    std::ifstream file(filePath);
+    if(!file){
+        std::cerr << "Erreur de l'ecture du fichier : " << filePath << std::endl;
         return NULL;
     }
 
     json data;
-    fichier >> data;
+    file >> data;
 
     return data;
 }
 
-void JsonGestionner::ajouterEntree(const std::string& cheminFichier, std::string& site, std::string& username, std::string& password, std::string& note){
-    std::ifstream input(cheminFichier);
+void JsonGestionner::addEntry(const std::string& filePath, std::string& site, std::string& username, std::string& password, std::string& note){
+    std::ifstream input(filePath);
     json data;
 
     if(input){
@@ -31,15 +31,20 @@ void JsonGestionner::ajouterEntree(const std::string& cheminFichier, std::string
         data["entries"] = json::array();
     }
 
-    json entree;
-    entree["site"] = site;
-    entree["username"] = username;
-    entree["password"] = password;
-    entree["note"] = note;
+    json entry;
+    entry["site"] = site;
+    entry["username"] = username;
+    entry["password"] = password;
+    entry["note"] = note;
 
-    data["entries"].push_back(entree);
+    data["entries"].push_back(entry);
 
-    std::ofstream output(cheminFichier);
+    std::ofstream output(filePath);
     output << data.dump(4);
     output.close();
+}
+
+
+void JsonGestionner::supprimerEntree(const std::string& filePath, int supNumber){
+
 }

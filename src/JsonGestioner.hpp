@@ -10,9 +10,11 @@ using json = nlohmann::json;
 class JsonGestionner {
     public:
 
-    static json lireFichier(const std::string& cheminFichier);
+    static json readFile(const std::string& filePath);
 
-    static void  ajouterEntree(const std::string& cheminFichier, std::string& site, std::string& username, std::string& password, std::string& note);
+    static void  addEntry(const std::string& filePath, std::string& site, std::string& username, std::string& password, std::string& note);
+
+    static void supprimerEntree(const std::string& filePath, int supNumber);
 
 };
 

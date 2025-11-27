@@ -29,7 +29,7 @@ void printMenu(){
     }
 }
 
-bool choixInput(std::string demande){
+bool chooseInput(std::string demande){
     std::string choix = "y";
 
     std::cout << demande;
@@ -71,19 +71,25 @@ void App::menu(){
 
     while(true){
 
-        short choix = -1;
+        short c = -1;
 
         printMenu();
         std::cout << "votre choix : ";
-        std::cin >> choix;
+        std::cin >> c;
 
-        switch (choix) {
+        switch (c) {
+
+
+            // CASE 0 TERMINÉ
 
             case 0: {
                 std::cout << "au revoir !" << std::endl;
                 exit(EXIT_SUCCESS);
                 break;
             }
+
+
+            // CASE 1 TERMINÉ
 
             case 1: {
                 int len = 10;
@@ -95,9 +101,9 @@ void App::menu(){
 
                 PassGen::Options opts{
                     opts.len = len,
-                    opts.maj = choixInput("voulez vous ajouter des majuscules ? (Y, n)"),
-                    opts.num = choixInput("voulez vous ajouter des nombres ? (Y, n)"),
-                    opts.spe = choixInput("voulez vous ajouter des speciaux ? (Y, n)"),
+                    opts.maj = chooseInput("voulez vous ajouter des majuscules ? (Y, n)"),
+                    opts.num = chooseInput("voulez vous ajouter des nombres ? (Y, n)"),
+                    opts.spe = chooseInput("voulez vous ajouter des speciaux ? (Y, n)"),
                 };
 
                 std::cout << "\n\n\n" << "Votre mdp : " << PassGen::genratePassword(opts) << "\n\n\n";
@@ -105,11 +111,14 @@ void App::menu(){
                 break;
             }
 
+
+            // CASE 2 EN COURS
+
             case 2: {
 
                 /*demander le mdp pour decrypter*/
 
-                json data = JsonGestionner::lireFichier("json/mdp.json");
+                json data = JsonGestionner::readFile("json/mdp.json");
 
                 if(data.contains("entries")){
                     for(const auto& entry : data["entries"]){
@@ -122,6 +131,9 @@ void App::menu(){
                 break;
             }
 
+
+            // CASE 3 TERMINÉ
+
             case 3: {
                 std::string site, username, mdp, note;
                 std::cout << "entrez le nom du site : ";
@@ -132,9 +144,12 @@ void App::menu(){
                 std::cin >> mdp;
                 std::cout << "entrez une note : ";
                 std::cin >> note;
-                JsonGestionner::ajouterEntree("json/mdp.json", site, username, mdp, note);
+                JsonGestionner::addEntry("json/mdp.json", site, username, mdp, note);
                 break;
             }
+
+
+            // CASE 4 A COMMENCER
 
             case 4: {
                 std::cout << "supp mdp" << std::endl;

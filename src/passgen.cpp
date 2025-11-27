@@ -11,7 +11,7 @@ std::string PassGen::genratePassword(const Options &opts){
     std::string numb = "0123456789";
     std::string spec = "!@#$%^&*()-_=+[]{};:,.<>?/";
 
-    std::string mdp;
+    std::string password;
 
     if (opts.maj) let += majLet;
     if (opts.num) let += numb;
@@ -23,11 +23,11 @@ std::string PassGen::genratePassword(const Options &opts){
 
     srand(time(NULL));
 
-    mdp.reserve(opts.len);
+    password.reserve(opts.len);
     for(int i=0; i<opts.len; ++i){
-        mdp += let[rand() % let.size()];
+        password += let[rand() % let.size()];
     }
 
-    return mdp;
+    return password;
 }
 

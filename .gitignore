@@ -7,3 +7,6 @@ json/mdp.json
 
 #my passwords
 .password.txt
+
+#Qt test
+qt_test/*
