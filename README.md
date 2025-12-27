@@ -11,7 +11,7 @@
 - 📁 Stockage des données par utilisateur
 - 🗂️ Organisation des fichiers en JSON
 - 🔐 Base pour chiffrement / hash des mots de passe (à venir)
-- 🖥️ Interface en ligne de commande (CLI)
+- 🖥️ Interface en ligne de commande CLI (provisoire)
 
 ---
 
