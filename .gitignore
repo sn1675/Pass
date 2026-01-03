@@ -13,5 +13,8 @@ users/*
 !users/testUser
 !users/testUser/**
 
+!users/testUser2
+!users/testUser2/**
+
 #Qt test
 qt_test/*
