@@ -1,12 +1,17 @@
-#binary file
+#Binary file
 src/main
 main
 
-#important files
+#Struture files
 json/mdp.json
 
-#my passwords
+#My passwords
 .password.txt
+
+#User files
+users/*
+!users/testUser
+!users/testUser/**
 
 #Qt test
 qt_test/*
