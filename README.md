@@ -20,11 +20,17 @@
 ### Avec `g++` :
 
 ```bash
-g++ main.cpp src/*.cpp -o main && ./main
+g++ main.cpp src/*.cpp -o main
 ```
 
 Execution :
 
 ```bash
 ./main
+```
+
+Compilation + execution :
+
+```bash
+g++ main.cpp src/*.cpp -o main && ./main
 ```
