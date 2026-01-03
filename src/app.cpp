@@ -200,7 +200,6 @@ void App::menu(){
 
             case 1: {
                 int len = 10;
-                bool maj = false, num = false, spe = false;
 
                 std::cout << "longeur du mdp : ";
                 std::cin >> len;
