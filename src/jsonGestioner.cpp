@@ -20,6 +20,28 @@ json JsonGestionner::readFile(const std::string& filePath){
     return data;
 }
 
+void JsonGestionner::initPasswordFile(const std::string& filePath){
+    std::ofstream file(filePath);
+
+    if(!file){
+        std::cout << "Erreur de lecture fichier" << std::endl;
+        return;
+    }
+
+    file <<"{"
+        <<"\"entries\": ["
+        <<"{"
+        <<"\"note\": \"Main password\","
+        <<"\"password\": \"\","
+        <<"\"site\": \"\","
+        <<"\"username\": \"\""
+        <<"}"
+        <<"]"
+        <<"}";
+
+    file.close();
+}
+
 void JsonGestionner::addEntry(const std::string& filePath, std::string& site, std::string& username, std::string& password, std::string& note){
     std::ifstream input(filePath);
     json data;

@@ -127,9 +127,6 @@ void App::login(){
                     break;
                 }
 
-                //choisir le mdp à faire
-
-
                 std::filesystem::create_directory(userPath);
                 if(!std::filesystem::exists(userPath)){ std::cout << "Erreur dans la creation du dossier" << std::endl; break;}
 
@@ -141,6 +138,15 @@ void App::login(){
                     std::cerr << "Erreur dans la creation d un ou des fichier" << std::endl;
                     break;
                 }
+
+                //choisir le mdp Maitre
+                /*
+
+                std::string mainPassword;
+                std::cout << "Entrez votre mot de passe Maitre: ";
+                */
+
+                JsonGestionner::initPasswordFile(userPath / "mdp.json");
 
                 filePassword.close();
                 fileEnv.close();
