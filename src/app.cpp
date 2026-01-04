@@ -10,6 +10,7 @@
 #include "Passgen.hpp"
 #include "JsonGestioner.hpp"
 #include "App.hpp"
+#include "Crypto.hpp"
 
 
 using json = nlohmann::json; //permet de pas ecrire nlohmann::json a chaque fois
@@ -108,7 +109,29 @@ void App::login(){
             // CASE 1 EN COURS
 
             case 1: {
-                //complicado
+                std::string nom;
+                std::cout << "Entrez votre nom d'utilisateur : ";
+                std::cin >> nom;
+
+                std::filesystem::path userPath = std::filesystem::path("users") / nom;
+
+                if(!std::filesystem::exists(userPath)){
+                    std::cout << "Le nom d'utilisateur n'existe pas" << std::endl;
+                    break;
+                }
+
+                std::string mainPassword;
+                std::cout << "Entrez votre mot de passe: ";
+                std::cin >>mainPassword;
+                //pareil une verif de mdp serait bien
+
+                if(Crypto::verifyMasterPassword(mainPassword, Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"))){
+                    std::cout << "Mot de passe bon !" << std::endl;
+                    App::menu(userPath);
+                } else {
+                    std::cout << "Mot de passe errone" << std::endl;
+                }
+
                 break;
             }
 
@@ -139,17 +162,25 @@ void App::login(){
                     break;
                 }
 
-                //choisir le mdp Maitre
-                /*
 
                 std::string mainPassword;
                 std::cout << "Entrez votre mot de passe Maitre: ";
-                */
+                std::cin >>mainPassword;
+                //verrifier si mdp possible
+
+                std::string salt = Crypto::generateSalt();
+                std::string pwdHash = Crypto::hashPassword(mainPassword, salt);
+
+                fileEnv << "PASSWORD_HASH=" << pwdHash << "\n";
+                fileEnv << "SALT=" << salt << "\n";
+
+                std::fill(mainPassword.begin(), mainPassword.end(), '\0');
+
+                fileEnv.close();
+                filePassword.close();
 
                 JsonGestionner::initPasswordFile(userPath / "mdp.json");
 
-                filePassword.close();
-                fileEnv.close();
                 break;
             }
 
@@ -174,7 +205,7 @@ void App::login(){
     }
 }
 
-void App::menu(){
+void App::menu(const std::string& sessionPath){
 
     while(true){
 
@@ -224,7 +255,7 @@ void App::menu(){
 
                 /*demander le mdp pour decrypter*/
 
-                json data = JsonGestionner::readFile("json/mdp.json");
+                json data = JsonGestionner::readFile(sessionPath + "/mdp.json");
 
                 if(data.contains("entries")){
                     for(const auto& entry : data["entries"]){
@@ -250,7 +281,7 @@ void App::menu(){
                 std::cin >> mdp;
                 std::cout << "entrez une note : ";
                 std::cin >> note;
-                JsonGestionner::addEntry("json/mdp.json", site, username, mdp, note);
+                JsonGestionner::addEntry(sessionPath + "/mdp.json", site, username, mdp, note);
                 break;
             }
 
