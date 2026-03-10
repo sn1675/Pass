@@ -17,6 +17,12 @@
             "password": "CeciEstUnBonMotDePasse2005!",
             "site": "entuphf.fr",
             "username": "nathan.courbet"
+        },
+        {
+            "note": "test",
+            "password": "motdepasse",
+            "site": "google.com",
+            "username": "usernameTest"
         }
     ]
 }

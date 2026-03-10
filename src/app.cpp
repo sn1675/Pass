@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <openssl/evp.h>
+
 
 #include "../json/json.hpp"
 
@@ -127,7 +129,8 @@ void App::login(){
 
                 if(Crypto::verifyMasterPassword(mainPassword, Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"))){
                     std::cout << "Mot de passe bon !" << std::endl;
-                    App::menu(userPath);
+                    std::fill(mainPassword.begin(), mainPassword.end(), '\0');
+                    App::menu(userPath, Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"));
                 } else {
                     std::cout << "Mot de passe errone" << std::endl;
                 }
@@ -205,7 +208,7 @@ void App::login(){
     }
 }
 
-void App::menu(const std::string& sessionPath){
+void App::menu(const std::string& sessionPath, const std::string& sessionHash, const std::string& sessionSalt){
 
     while(true){
 
@@ -269,19 +272,38 @@ void App::menu(const std::string& sessionPath){
             }
 
 
-            // CASE 3 TERMINE
+            // CASE 3 EN COURS
 
             case 3: {
-                std::string site, username, mdp, note;
-                std::cout << "entrez le nom du site : ";
-                std::cin >> site;
-                std::cout << "entrez votre username : ";
-                std::cin >> username;
-                std::cout << "entrez votre mdp : ";
-                std::cin >> mdp;
-                std::cout << "entrez une note : ";
-                std::cin >> note;
-                JsonGestionner::addEntry(sessionPath + "/mdp.json", site, username, mdp, note);
+
+                std::string mainPassword;
+                std::cout << "Entrez votre mot de passe Maitre: ";
+                std::cin >>mainPassword;
+
+                if(Crypto::verifyMasterPassword(mainPassword, sessionHash, sessionSalt)){
+                    std::cout << "Mot de passe bon !" << std::endl;
+
+                    std::string site, username, mdp, note;
+                    std::cout << "entrez le nom du site : ";
+                    std::cin >> site;
+                    std::cout << "entrez votre username : ";
+                    std::cin >> username;
+                    std::cout << "entrez votre mdp : ";
+                    std::cin >> mdp;
+                    std::cout << "entrez une note : ";
+                    std::cin >> note;
+
+                    /*std::vector<unsigned char> key = Crypto::deriveKey(mainPassword, );
+
+                    auto encrypted = Crypto::aes256Encrypt(mdp, key);
+
+                    JsonGestionner::addEntry(sessionPath + "/mdp.json", site, username, encrypted, note);*/
+
+                    std::fill(mainPassword.begin(), mainPassword.end(), '\0');
+                } else {
+                    std::cout << "Mot de passe errone" << std::endl;
+                    break;
+                }
                 break;
             }
 
