@@ -1,3 +1,6 @@
+#Variables d'environements
+.env
+
 #Struture files
 json/mdp.json
 

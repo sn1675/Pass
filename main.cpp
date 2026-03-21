@@ -9,13 +9,17 @@
  *
 */
 
-#include "src/App.hpp"
+#include <QApplication>
+#include "src/qtWindow/mainwindow.h"
 
-int main(){
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
 
-    App::login();
+    MainWindow window;
+    window.show();
 
-    return 0;
+    return app.exec();
 }
+
 
 //g++ main.cpp src/*.cpp -o main && ./main

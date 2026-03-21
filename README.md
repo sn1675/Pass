@@ -1,7 +1,6 @@
 # 🔐 Password Manager (C++)
 
-> ⚠️ Projet en cours de développement – **non destiné à un usage en production**
-
+> ⚠️ Projet en cours de développement
 ---
 
 ## 📌 Fonctionnalités
@@ -16,6 +15,20 @@
 ---
 
 ## ⚙️ Compilation
+
+### avec `Make`
+```bash
+make
+```
+
+Vous pouvez trouver le build dans le dossier **build**
+execution
+```bash
+./build/main
+```
+
+
+Optionelle:
 
 ### Avec `g++` :
 

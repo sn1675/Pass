@@ -220,7 +220,6 @@ void App::menu(const std::string& sessionPath, const std::string& sessionHash, c
 
         switch (c) {
 
-
             // CASE 0 TERMINE
 
             case 0: {
