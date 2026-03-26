@@ -1,7 +1,4 @@
-
-#ifndef JSONGESTIONER_HPP
-#define JSONGESTIONER_HPP
-
+#pragma once
 #include "../json/json.hpp"
 #include <string>
 
@@ -19,5 +16,3 @@ class JsonGestionner {
     static void supprimerEntree(const std::string& filePath, int supNumber);
 
 };
-
-#endif // JSONGESTIONER_HPP

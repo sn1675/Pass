@@ -1,6 +1,4 @@
-#ifndef CRYPTO_HPP
-#define CRYPTO_HPP
-
+#pragma once
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -25,5 +23,3 @@ class Crypto {
 
         static std::vector<unsigned char> hexToBytes(const std::string& hex);
 };
-
-#endif

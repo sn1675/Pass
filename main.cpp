@@ -21,5 +21,11 @@ int main(int argc, char *argv[]) {
     return app.exec();
 }
 
-
-//g++ main.cpp src/*.cpp -o main && ./main
+/*
+ * Compilation
+ *
+ * /Pass : make && ./cestionaire
+ *
+ * /build : qmake cestionaire.pro && make && ./cestionaire
+ *
+*/

@@ -1,7 +1,4 @@
-
-#ifndef APP_HPP
-#define APP_HPP
-
+#pragma once
 #include <string>
 
 class App {
@@ -11,5 +8,3 @@ class App {
 
     static void menu(const std::string& sessionPath, const std::string& sessionHash, const std::string& sessionSalt);
 };
-
-#endif // APP_H

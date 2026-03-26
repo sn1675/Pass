@@ -1,7 +1,4 @@
-
-#ifndef PASSGEN_HPP
-#define PASSGEN_HPP
-
+#pragma once
 #include <string>
 
 class PassGen {
@@ -16,5 +13,3 @@ class PassGen {
     static std::string genratePassword(const Options& opts);
 
 };
-
-#endif // GEN_H
