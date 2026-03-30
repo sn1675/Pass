@@ -15,7 +15,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 
 private slots:
+    // Page 0
     void onLoginClicked();
+    void onAccountClicked();
 
 private:
     QStackedWidget *m_stack;
@@ -34,7 +36,7 @@ private:
 
     // Page 2 - Login
     QWidget     *m_ACPage;
-    QLineEdit   *m_AC_userField;
+    QLineEdit   *m_ACuserField;
     QLineEdit   *m_ACpassField;
     QPushButton *m_ACregisterBtn;
     QLabel      *m_ACstatusLabel;
