@@ -740,7 +740,8 @@ passgen.o: ../src/passgen.cpp ../src/Passgen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o passgen.o ../src/passgen.cpp
 
 mainwindow.o: ../src/qtWindow/mainwindow.cpp ../src/qtWindow/mainwindow.h \
-		../src/Crypto.hpp
+		../src/Crypto.hpp \
+		../json/json.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../src/qtWindow/mainwindow.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
