@@ -741,6 +741,7 @@ passgen.o: ../src/passgen.cpp ../src/Passgen.hpp
 
 mainwindow.o: ../src/qtWindow/mainwindow.cpp ../src/qtWindow/mainwindow.h \
 		../src/Crypto.hpp \
+		../src/JsonGestioner.hpp \
 		../json/json.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../src/qtWindow/mainwindow.cpp
 
