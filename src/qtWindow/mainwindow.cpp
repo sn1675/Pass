@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "../Crypto.hpp"
+#include "../JsonGestioner.hpp"
 #include "../../json/json.hpp"
 #include <fstream>
 #include <QApplication>
@@ -93,6 +94,19 @@ static const char* APP_STYLE = R"(
     }
     QPushButton#iconBtn:pressed { background-color: #1a2040; }
 
+    /* ── Add button ──────────────────────────── */
+    QPushButton#addBtn {
+        background-color: #3d7aff;
+        color: #ffffff;
+        border: none;
+        border-radius: 20px;
+        font-size: 20px;
+        font-weight: 700;
+        padding: 0;
+    }
+    QPushButton#addBtn:hover  { background-color: #5a8fff; }
+    QPushButton#addBtn:pressed { background-color: #2d64e0; }
+
     /* ── Scroll area ─────────────────────────── */
     QScrollArea {
         background-color: transparent;
@@ -123,20 +137,21 @@ QFrame#separator {
 }
 
 /* ── Labels ──────────────────────────────── */
-QLabel#titleLabel   { color: #e8eaf0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-QLabel#subtitleLabel{ color: #4a5470; font-size: 12px; letter-spacing: 0.4px; }
-QLabel#iconLabel    { color: #3d7aff; font-size: 36px; }
-QLabel#sectionLabel { color: #4a5470; font-size: 11px; font-weight: 600; letter-spacing: 1.2px; }
-QLabel#errorLabel   { color: #ff5c5c; font-size: 12px; }
+QLabel#titleLabel    { color: #e8eaf0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+QLabel#subtitleLabel { color: #4a5470; font-size: 12px; letter-spacing: 0.4px; }
+QLabel#iconLabel     { color: #3d7aff; font-size: 36px; }
+QLabel#sectionLabel  { color: #4a5470; font-size: 11px; font-weight: 600; letter-spacing: 1.2px; }
+QLabel#errorLabel    { color: #ff5c5c; font-size: 12px; }
+QLabel#successLabel  { color: #4caf50; font-size: 12px; }
 
 QLabel#welcomeTitle { color: #e8eaf0; font-size: 20px; font-weight: 700; }
 QLabel#countLabel   { color: #4a5470; font-size: 12px; }
 
-QLabel#siteLabel    { color: #e8eaf0; font-size: 13px; font-weight: 600; }
-QLabel#userLabel    { color: #7a8aaa; font-size: 12px; }
-QLabel#noteLabel    { color: #4a5470; font-size: 11px; font-style: italic; }
-QLabel#passLabel    { color: #3d7aff; font-size: 12px; font-family: "Courier New", monospace; }
-QLabel#emptyLabel   { color: #3a4055; font-size: 13px; }
+QLabel#siteLabel  { color: #e8eaf0; font-size: 13px; font-weight: 600; }
+QLabel#userLabel  { color: #7a8aaa; font-size: 12px; }
+QLabel#noteLabel  { color: #4a5470; font-size: 11px; font-style: italic; }
+QLabel#passLabel  { color: #3d7aff; font-size: 12px; font-family: "Courier New", monospace; }
+QLabel#emptyLabel { color: #3a4055; font-size: 13px; }
 )";
 
 
@@ -169,7 +184,7 @@ QWidget* MainWindow::buildEntryCard(const std::string& site,
     vl->setContentsMargins(16, 14, 16, 14);
     vl->setSpacing(6);
 
-    // — Site + copy button on the same row —
+    // — Site + copy button —
     QHBoxLayout* topRow = new QHBoxLayout();
     topRow->setSpacing(8);
 
@@ -190,11 +205,11 @@ QWidget* MainWindow::buildEntryCard(const std::string& site,
     QLabel* userLabel = new QLabel("👤  " + QString::fromStdString(username));
     userLabel->setObjectName("userLabel");
 
-    // — Password row (masked by default) —
+    // — Password row (masked) —
     QHBoxLayout* passRow = new QHBoxLayout();
     passRow->setSpacing(8);
 
-    QString maskedPass = QString(password.size(), QChar(0x2022)); // ●●●●
+    QString maskedPass = QString(password.size(), QChar(0x2022));
     QLabel* passLabel = new QLabel(maskedPass);
     passLabel->setObjectName("passLabel");
 
@@ -208,7 +223,7 @@ QWidget* MainWindow::buildEntryCard(const std::string& site,
     passRow->addStretch();
     passRow->addWidget(revealBtn);
 
-    // — Note (optional) —
+    // — Note —
     QLabel* noteLabel = nullptr;
     if (!note.empty() && note != "exemplemdp") {
         noteLabel = new QLabel("📝  " + QString::fromStdString(note));
@@ -224,13 +239,8 @@ QWidget* MainWindow::buildEntryCard(const std::string& site,
     QString pwd = QString::fromStdString(password);
 
     connect(revealBtn, &QPushButton::toggled, [=](bool checked) {
-        if (checked) {
-            passLabel->setText(pwd);
-            revealBtn->setText("🙈 Masquer");
-        } else {
-            passLabel->setText(QString(pwd.size(), QChar(0x2022)));
-            revealBtn->setText("👁 Afficher");
-        }
+        passLabel->setText(checked ? pwd : QString(pwd.size(), QChar(0x2022)));
+        revealBtn->setText(checked ? "🙈 Masquer" : "👁 Afficher");
     });
 
     connect(copyBtn, &QPushButton::clicked, [=]() {
@@ -244,10 +254,10 @@ QWidget* MainWindow::buildEntryCard(const std::string& site,
 
 
 // ─────────────────────────────────────────────
-//  Load entries from mdp.json into m_entriesLayout
+//  Load entries from mdp.json
 // ─────────────────────────────────────────────
 void MainWindow::loadEntries() {
-    // Clear previous entries (keep only header items: 0..3)
+    // Clear previous entries (keep header items at indices 0..3)
     while (m_entriesLayout->count() > 4) {
         QLayoutItem* item = m_entriesLayout->takeAt(4);
         if (item->widget()) item->widget()->deleteLater();
@@ -269,10 +279,11 @@ void MainWindow::loadEntries() {
         return;
     }
 
-    // Update count label (index 2 in layout = countLabel)
+    // Update count label (index 2)
     if (auto* lbl = qobject_cast<QLabel*>(m_entriesLayout->itemAt(2)->widget())) {
         int n = data["entries"].size();
         lbl->setText(QString::number(n) + " entrée" + (n > 1 ? "s" : ""));
+        lbl->show();
     }
 
     for (const auto& entry : data["entries"]) {
@@ -280,7 +291,6 @@ void MainWindow::loadEntries() {
         std::string username = entry.value("username", "—");
         std::string password = entry.value("password", "");
         std::string note     = entry.value("note",     "");
-
         m_entriesLayout->addWidget(buildEntryCard(site, username, password, note));
     }
 
@@ -355,32 +365,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 
     // ══════════════════════════════════════════
-    //  PAGE 1 — Accueil (scroll + entries)
+    //  PAGE 1 — Accueil
     // ══════════════════════════════════════════
     m_homePage = new QWidget();
     QVBoxLayout* homeOuter = new QVBoxLayout(m_homePage);
     homeOuter->setContentsMargins(20, 20, 20, 20);
     homeOuter->setSpacing(0);
 
-    // Header card (fixe)
+    // Header card avec bouton +
     QWidget* headerCard = new QWidget();
     headerCard->setObjectName("card");
     QHBoxLayout* headerLayout = new QHBoxLayout(headerCard);
     headerLayout->setContentsMargins(20, 16, 20, 16);
 
-    QVBoxLayout* headerText = new QVBoxLayout();
-    headerText->setSpacing(2);
-
     m_welcomeLabel = new QLabel("Bienvenue !");
     m_welcomeLabel->setObjectName("welcomeTitle");
 
-    headerLayout->addLayout(headerText);
+    m_addPasswordBtn = new QPushButton("+");
+    m_addPasswordBtn->setObjectName("addBtn");
+    m_addPasswordBtn->setFixedSize(40, 40);
+    m_addPasswordBtn->setCursor(Qt::PointingHandCursor);
+    m_addPasswordBtn->setToolTip("Ajouter un mot de passe");
+
+    headerLayout->addWidget(m_welcomeLabel);
     headerLayout->addStretch();
+    headerLayout->addWidget(m_addPasswordBtn);
 
     homeOuter->addWidget(headerCard);
     homeOuter->addSpacing(12);
 
-    // Scroll area for entries
+    // Scroll area
     QScrollArea* scrollArea = new QScrollArea();
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -393,12 +407,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     m_entriesLayout->setContentsMargins(0, 0, 6, 0);
     m_entriesLayout->setSpacing(8);
 
-    // These 4 items are always present (indices 0..3):
-    // 0: section label
-    // 1: separator
-    // 2: countLabel (set dynamically)
-    // 3: (spacing item handled via addSpacing — use a dummy widget instead)
-
+    // Indices fixes 0..3 utilisés par loadEntries()
     QLabel* mdpSection = new QLabel("MES MOTS DE PASSE");
     mdpSection->setObjectName("sectionLabel");
     m_entriesLayout->addWidget(mdpSection);              // index 0
@@ -408,13 +417,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     sep2->setFrameShape(QFrame::HLine);
     m_entriesLayout->addWidget(sep2);                    // index 1
 
-    // Placeholder count label that loadEntries() will update via itemAt(2)
     QLabel* countPlaceholder = new QLabel("");
     countPlaceholder->setObjectName("countLabel");
     countPlaceholder->hide();
     m_entriesLayout->addWidget(countPlaceholder);        // index 2
 
-    // Spacer widget so index 3 exists (loadEntries keeps items 0..3)
     QLabel* spacerItem = new QLabel("");
     spacerItem->setFixedHeight(4);
     m_entriesLayout->addWidget(spacerItem);              // index 3
@@ -472,21 +479,89 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 
     // ══════════════════════════════════════════
+    //  PAGE 3 — Ajout d'un mot de passe
+    // ══════════════════════════════════════════
+    m_addPage = new QWidget();
+    QVBoxLayout* addOuter = new QVBoxLayout(m_addPage);
+    addOuter->setAlignment(Qt::AlignCenter);
+    addOuter->setContentsMargins(56, 0, 56, 0);
+
+    QVBoxLayout* addCard = new QVBoxLayout();
+
+    QLabel* addTitle = new QLabel("Nouveau mot de passe");
+    addTitle->setObjectName("titleLabel");
+    addTitle->setAlignment(Qt::AlignCenter);
+
+    QFrame* sep4 = new QFrame(); sep4->setObjectName("separator"); sep4->setFrameShape(QFrame::HLine);
+
+    QLabel* addSection = new QLabel("INFORMATIONS");
+    addSection->setObjectName("sectionLabel");
+
+    m_siteField = new QLineEdit();
+    m_siteField->setPlaceholderText("Site  (ex: google.com)");
+
+    m_usernameEntryField = new QLineEdit();
+    m_usernameEntryField->setPlaceholderText("Nom d'utilisateur");
+
+    m_passwordEntryField = new QLineEdit();
+    m_passwordEntryField->setPlaceholderText("Mot de passe");
+    m_passwordEntryField->setEchoMode(QLineEdit::Password);
+
+    m_noteField = new QLineEdit();
+    m_noteField->setPlaceholderText("Note  (optionnel)");
+
+    m_saveEntryBtn = new QPushButton("Enregistrer");
+    m_saveEntryBtn->setObjectName("primaryBtn");
+    m_saveEntryBtn->setCursor(Qt::PointingHandCursor);
+
+    m_backBtn = new QPushButton("← Retour");
+    m_backBtn->setObjectName("ghostBtn");
+    m_backBtn->setCursor(Qt::PointingHandCursor);
+
+    m_addStatusLabel = new QLabel("");
+    m_addStatusLabel->setObjectName("errorLabel");
+    m_addStatusLabel->setAlignment(Qt::AlignCenter);
+
+    addCard->addWidget(addTitle);
+    addCard->addSpacing(4);
+    addCard->addWidget(sep4);
+    addCard->addSpacing(4);
+    addCard->addWidget(addSection);
+    addCard->addWidget(m_siteField);
+    addCard->addWidget(m_usernameEntryField);
+    addCard->addWidget(m_passwordEntryField);
+    addCard->addWidget(m_noteField);
+    addCard->addSpacing(4);
+    addCard->addWidget(m_saveEntryBtn);
+    addCard->addWidget(m_backBtn);
+    addCard->addWidget(m_addStatusLabel);
+
+    addOuter->addWidget(buildCard(addCard));
+
+
+    // ══════════════════════════════════════════
     //  Stack
     // ══════════════════════════════════════════
-    m_stack->addWidget(m_loginPage);   // 0
-    m_stack->addWidget(m_homePage);    // 1
-    m_stack->addWidget(m_ACPage);      // 2
+    m_stack->addWidget(m_loginPage);  // 0
+    m_stack->addWidget(m_homePage);   // 1
+    m_stack->addWidget(m_ACPage);     // 2
+    m_stack->addWidget(m_addPage);    // 3
     m_stack->setCurrentIndex(0);
 
+    // Page 0
     connect(m_loginBtn,   &QPushButton::clicked,     this, &MainWindow::onLoginClicked);
     connect(m_passField,  &QLineEdit::returnPressed, this, &MainWindow::onLoginClicked);
     connect(m_accountBtn, &QPushButton::clicked,     this, &MainWindow::onAccountClicked);
+    // Page 1
+    connect(m_addPasswordBtn, &QPushButton::clicked, this, &MainWindow::onAddPasswordClicked);
+    // Page 3
+    connect(m_saveEntryBtn, &QPushButton::clicked, this, &MainWindow::onSaveEntryClicked);
+    connect(m_backBtn,      &QPushButton::clicked, this, &MainWindow::onBackToHomeClicked);
 }
 
 
 // ─────────────────────────────────────────────
-//  Slots
+//  Slots — Page 0
 // ─────────────────────────────────────────────
 void MainWindow::onLoginClicked() {
     QString user = m_userField->text().trimmed();
@@ -499,7 +574,7 @@ void MainWindow::onLoginClicked() {
         return;
     }
 
-    if (Crypto::verifyMasterPassword(pass.toStdString(), Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"))) {
+    if (Crypto::verifyMasterPassword(pass.toStdString(), Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"))){
         m_sessionPath = userPath;
         m_welcomeLabel->setText("Bienvenue, " + user + " !");
         loadEntries();
@@ -507,10 +582,57 @@ void MainWindow::onLoginClicked() {
         m_statusLabel->clear();
     } else {
         m_statusLabel->setText("Identifiants incorrects");
-
     }
 }
 
 void MainWindow::onAccountClicked() {
     m_stack->setCurrentIndex(2);
+}
+
+
+// ─────────────────────────────────────────────
+//  Slots — Page 1
+// ─────────────────────────────────────────────
+void MainWindow::onAddPasswordClicked() {
+    // Réinitialise le formulaire
+    m_siteField->clear();
+    m_usernameEntryField->clear();
+    m_passwordEntryField->clear();
+    m_noteField->clear();
+    m_addStatusLabel->clear();
+    m_stack->setCurrentIndex(3);
+}
+
+
+// ─────────────────────────────────────────────
+//  Slots — Page 3
+// ─────────────────────────────────────────────
+void MainWindow::onSaveEntryClicked() {
+    std::string site     = m_siteField->text().trimmed().toStdString();
+    std::string username = m_usernameEntryField->text().trimmed().toStdString();
+    std::string password = m_passwordEntryField->text().toStdString();
+    std::string note     = m_noteField->text().trimmed().toStdString();
+
+    if (site.empty() || username.empty() || password.empty()) {
+        m_addStatusLabel->setObjectName("errorLabel");
+        m_addStatusLabel->setStyleSheet("color: #ff5c5c; font-size: 12px;");
+        m_addStatusLabel->setText("Site, utilisateur et mot de passe sont obligatoires.");
+        return;
+    }
+
+    std::string filePath = (m_sessionPath / "mdp.json").string();
+    JsonGestionner::addEntry(filePath, site, username, password, note);
+
+    m_addStatusLabel->setStyleSheet("color: #4caf50; font-size: 12px;");
+    m_addStatusLabel->setText("✅ Entrée enregistrée !");
+
+    // Recharge la liste en arrière-plan
+    loadEntries();
+
+    // Retour automatique après 1 seconde
+    QTimer::singleShot(1000, [=]() { m_stack->setCurrentIndex(1); });
+}
+
+void MainWindow::onBackToHomeClicked() {
+    m_stack->setCurrentIndex(1);
 }
