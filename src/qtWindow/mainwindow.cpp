@@ -499,17 +499,16 @@ void MainWindow::onLoginClicked() {
         return;
     }
 
-    if (Crypto::verifyMasterPassword(pass.toStdString(),
-        Crypto::get(userPath / ".env", "PASSWORD_HASH"),
-                                     Crypto::get(userPath / ".env", "SALT"))) {
+    if (Crypto::verifyMasterPassword(pass.toStdString(), Crypto::get(userPath / ".env", "PASSWORD_HASH"), Crypto::get(userPath / ".env", "SALT"))) {
         m_sessionPath = userPath;
-    m_welcomeLabel->setText("Bienvenue, " + user + " !");
-    loadEntries();
-    m_stack->setCurrentIndex(1);
-    m_statusLabel->clear();
-                                     } else {
-                                         m_statusLabel->setText("Identifiants incorrects");
-                                     }
+        m_welcomeLabel->setText("Bienvenue, " + user + " !");
+        loadEntries();
+        m_stack->setCurrentIndex(1);
+        m_statusLabel->clear();
+    } else {
+        m_statusLabel->setText("Identifiants incorrects");
+
+    }
 }
 
 void MainWindow::onAccountClicked() {
